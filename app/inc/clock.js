@@ -27,21 +27,25 @@ export default class Clock {
     this.txtClockSec.style.opacity = displaySeconds ? 1 : 0;
   }
 
-  setClockSize(clockSizeObject) {
+  setClockSize(clockSizeObject, hours) {
     const clockSize = CLOCK_SIZES[clockSizeObject.selected];
     switch (clockSize) {
       case CLOCK_SIZE_NORMAL:
         this.txtClock.style.fontSize = 80;
+        const sideTextX = hours.toString().length > 1 ? 244 : 220;
+        this.txtClockSec.x = sideTextX;
+        this.txtAMPM.x = sideTextX;
         break;
       case CLOCK_SIZE_LARGE:
         this.txtClock.style.fontSize = 100;
+        this.txtClockSec.x = 250;
+        this.txtAMPM.x = 250;
         break;
     }
   }
 
   init(fileStore) {
     this.setDisplaySeconds(fileStore.getValue(KEY_DISPLAY_SECONDS));
-    this.setClockSize(fileStore.getValue(KEY_CLOCK_SIZE));
 
     // Update the clock / date every tick
     clock.ontick = (evt) => {
@@ -58,15 +62,15 @@ export default class Clock {
         hours = util.zeroPad(hours);
       }
 
+      this.setClockSize(fileStore.getValue(KEY_CLOCK_SIZE), hours);
+
       // Print the clock
       const mins = util.zeroPad(today.getMinutes());
       const secs = util.zeroPad(today.getSeconds());
-      const sideTextX = hours.toString().length > 1 ? 244 : 220;
+
       this.txtClock.text = `${hours}:${mins}`;
       this.txtClockSec.text = secs;
       this.txtAMPM.text = `${ampm}`;
-      this.txtClockSec.x = sideTextX;
-      this.txtAMPM.x = sideTextX;
 
       // Print the date
       const date = new Date();
